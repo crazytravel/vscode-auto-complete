@@ -28,32 +28,17 @@ function activate(context) {
 		vscode.window.showInformationMessage('Auto Complete is worked');
 		let position = textEditor.selection.active;
 		let lineNumber = position.line;
-		const line = editor.document.lineAt(lineNumber);
-		intelligentAutoComplete(editor, edit, line);
+		const line = textEditor.document.lineAt(lineNumber);
+		intelligentAutoComplete(edit, line);
 	});
 
-
-	// current editor
-	const editor = vscode.window.activeTextEditor;
-
-	// check if there is no selection
-	if (editor.selection.isEmpty) {
-		// the position object gives you the line and character where the cursor is
-		const position = editor.selection.active;
-		console.log('current position: ', position);
-		let newPosition = position.with(position.line, 0);
-	}
-
-
-	const intelligentAutoComplete = function (editor, edit, line) {
+	const intelligentAutoComplete = function (edit, line) {
+		const editor = vscode.window.activeTextEditor;
 		const lang = editor.document.languageId;
 		const lineText = line.text;
 		const position = line.range.end;
-		const lastChar = lineText.substr(-1);
 		console.log('language_id: ', lang);
 		console.log('line_text:', lineText);
-		console.log('last_char:', lastChar);
-
 		switch (lang) {
 			case 'javascript':
 				edit.insert(position, ";");
@@ -62,32 +47,62 @@ function activate(context) {
 				edit.insert(position, ";");
 				break;
 			case 'rust':
-				rustAutoComplete(lastChar, edit, position);
+				rustAutoComplete(lineText, position);
 				break;
 			default:
 				console.log('%s language not implemented by vscode-auto-complete', lang);
 				break;
 		}
-		const newPosition = position.with(position.line + 1, 0);
-		const newSelection = new vscode.Selection(newPosition, newPosition);
-		editor.selection = newSelection;
 	}
 
-	const rustAutoComplete = function (lastChar, edit, position) {
+	const rustAutoComplete = function (lineText, position) {
+		const editor = vscode.window.activeTextEditor;
+		const lastChar = lineText.substr(-1);
 		switch (lastChar) {
+			case ')':
+				if (lineText.indexOf('fn') != -1 
+				|| lineText.indexOf('if') != -1
+				|| lineText.indexOf('for') != -1
+				|| lineText.indexOf('match') != -1) {
+					editor.insertSnippet(new vscode.SnippetString('{'), position);
+					vscode.commands.executeCommand('editor.action.insertLineAfter').then(function () {
+						editor.insertSnippet(new vscode.SnippetString('}'));
+						vscode.commands.executeCommand('editor.action.outdentLines');
+						vscode.commands.executeCommand('editor.action.insertLineBefore');
+					});
+				} else {
+					editor.insertSnippet(new vscode.SnippetString(';'), position);
+					vscode.commands.executeCommand('editor.action.insertLineAfter');
+				}
+				break;
 			case '{':
 				console.log('The last char is [{] , just jump to new line');
+				vscode.commands.executeCommand('editor.action.insertLineAfter').then(function () {
+					editor.insertSnippet(new vscode.SnippetString('}'));
+					vscode.commands.executeCommand('editor.action.outdentLines');
+					vscode.commands.executeCommand('editor.action.insertLineBefore');
+				});
+				break;
+			case '}':
+				console.log('The last char is }');
+				editor.insertSnippet(new vscode.SnippetString('\r'));
+				vscode.commands.executeCommand('editor.action.insertLineBefore');
 				break;
 			case ';':
 				console.log('The last char is [;] , just jump to new line');
+				vscode.commands.executeCommand('editor.action.insertLineAfter');
 				break;
 			case ',':
 				console.log('The last char is [,] , just jump to new line');
+				// edit.insert(position, '\r\n');
+				vscode.commands.executeCommand('editor.action.insertLineAfter');
 				break;
 			default:
-				edit.insert(position, ";");
+				editor.insertSnippet(new vscode.SnippetString(';'), position);
+				vscode.commands.executeCommand('editor.action.insertLineAfter');
 				break;
 		}
+
 	}
 
 	context.subscriptions.push(disposable);
@@ -97,11 +112,6 @@ exports.activate = activate;
 
 // this method is called when your extension is deactivated
 function deactivate() { }
-
-function intelligentAutoComplete(lang, lineText, edit, position) {
-
-
-}
 
 module.exports = {
 	activate,
