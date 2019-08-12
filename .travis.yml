@@ -1,0 +1,29 @@
+language: node_js
+node_js:
+  - 12.7.0
+install:
+  - vsce
+  
+stages:
+  - build
+  - package
+jobs:
+  include:
+    - stage: build
+      name: Build
+      script: npm run compile
+    - stage: package
+      name: Package
+      script: vsce package
+before_deploy:
+  - echo "deploying to github release"
+deploy:
+  provider: releases
+  api_key:
+    secure: n5wLHA61cI5sMiipeyFcv9BaJRFOzCMl4jKlBwqUoHdK0Cb1L2WV5wUQ68vWSmyUBPpONro3wWR4ts0QEhPXv9FSryHq0TH0ZKw6aUOJc2qNumGfc4OW2OuDtFaQ898IjL2QmLl2Gz91VhayoAphQoKq9/P4v9lRla+Ze44FgrLc+j6UXJM+Jb6M0JjY2Chqo1g2CXR0OunJYa8G6DTOe5sBIGjM4q15mjrTjUYa9Pp0Tx1jCbkNjRKzpYRX0Z869Z4esXPgX9gbPGwWygs/al0QRAayKE4m5KZ7CHioWigaSuh7bpkAjR03dSr7jNPMPnHU35UJWUipc4VjlrrNqvfX490xzzvXd/o9083BfmaZgF/I4RmswRtXAQQflOEHG0Ei9GfS0oPyPiNr1iUTWA8lqN0EBiC8YNG82fsaYqLFfZIBA7Hrc9F/k3ZNhrZvOwVpucmOrGU0JeyQec36NZheOqB9xgPGXZVjEKI+BPlGWJCWqHjqSOvYNKDUFGcUJl6CfGOUyDd4vg1aYpRg81bxIWziHsiDEiMYCxAFraVnJINMk/VaTgrvPVbPIgGNOY2iOVcqk98Cl57+wVPdlqFUybbgR34hNHN4nguzvq0rucfa4gdFUElUk5pVgbrVCPS7A652z7cQ1Q+ksrklpqiGoA0RmFBEKCGoBHE2e2o=
+  file_glob: true
+  file:
+    - vscode-auto-complete-*
+  skip_cleanup: true
+  on:
+    tags: true

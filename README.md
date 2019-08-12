@@ -1,9 +1,12 @@
 # vscode-auto-complete
 
-This is an extension for vscode implement auto complete the code after type `cmd(ctrl) + shift + enter`.  
+This is an extension for vscode implement auto complete the code after type `cmd(ctrl) + shift + enter`.    
 This extension inherit [IntelliJ IDEA Keybindings for Visual Studio Code](https://github.com/kasecato/vscode-intellij-idea-keybindings) and implement Complete statement part just like Intellij IDEAs do finish the statement intelligently.
 
-## Feature
+## Download
+
+
+## Features
 
 * Most of Intellij IDEA key bindings for vscode
   
