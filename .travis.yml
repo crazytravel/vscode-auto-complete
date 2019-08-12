@@ -1,9 +1,11 @@
 language: node_js
+os:
+  - osx
+  - linux
 node_js:
   - 12.7.0
 install:
-  - vsce
-  
+  - npm install -g vsce
 stages:
   - build
   - package
