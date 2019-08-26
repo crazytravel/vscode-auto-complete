@@ -61,36 +61,6 @@ const appendNewline = () => {
 };
 
 
-
-const mapping: Map<string, Function> = new Map();
-mapping.set(')', matchRightBracket);
-mapping.set('{', appendCurlyBraceRight);
-mapping.set('}', appendNewline);
-mapping.set(';', appendNewline);
-mapping.set(',', appendNewline);
-
-export const matchGoReg = () => {
-
-    const editor: TextEditor = vscode.window.activeTextEditor!;
-    const lineNumber: number = editor.selection.active.line;
-    const line: TextLine = editor.document.lineAt(lineNumber);
-    const lineText: string = line.text;
-    const lastEditChar: string = lineText.substr(-1);
-
-    if (lineText.includes('struct')) {
-        appendCurlyBraceLeftAndRight();
-        return;
-    }
-
-    if (lineText.includes('interface')) {
-        appendCurlyBraceLeftAndRight();
-        return;
-    }
-
-    const func = mapping.get(lastEditChar);
-    if (func) {
-        func();
-    } else {
-        appendNewline();
-    }
+export const matchDefaultReg = () => {
+    appendNewline();
 };
